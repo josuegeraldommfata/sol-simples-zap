@@ -57,6 +57,21 @@ export default {
           border: "hsl(var(--sidebar-border))",
           ring: "hsl(var(--sidebar-ring))",
         },
+        whatsapp: {
+          green: "hsl(var(--whatsapp-green))",
+          dark: "hsl(var(--whatsapp-dark))",
+          light: "hsl(var(--whatsapp-light))",
+          "bubble-out": "hsl(var(--whatsapp-bubble-out))",
+          "bubble-in": "hsl(var(--whatsapp-bubble-in))",
+          bg: "hsl(var(--whatsapp-bg))",
+        },
+        status: {
+          hot: "hsl(var(--status-hot))",
+          "hot-foreground": "hsl(var(--status-hot-foreground))",
+          cold: "hsl(var(--status-cold))",
+          "cold-foreground": "hsl(var(--status-cold-foreground))",
+          "cold-light": "hsl(var(--status-cold-light))",
+        },
       },
       borderRadius: {
         lg: "var(--radius)",
