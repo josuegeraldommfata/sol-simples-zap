@@ -6,7 +6,11 @@ import { saveLead } from "@/data/mockLeads";
 interface LeadData {
   nome: string;
   cpf: string;
+  whatsapp: string;
   cep: string;
+  endereco: string;
+  numero: string;
+  bairro: string;
   consumo: number;
   tipoImovel: "residencial" | "comercial";
 }
@@ -16,7 +20,7 @@ interface ChatFlowState {
   step: ChatStep;
   leadData: Partial<LeadData>;
   isTyping: boolean;
-  inputType: "text" | "cpf" | "cep" | "buttons" | "none";
+  inputType: "text" | "cpf" | "cep" | "phone" | "buttons" | "none";
   buttons: { label: string; value: string }[];
 }
 
@@ -125,7 +129,17 @@ export const useChatFlow = () => {
     addUserMessage(cpf);
     setState((prev) => ({ ...prev, leadData: { ...prev.leadData, cpf } }));
     
-    addBotMessage("Perfeito! 📍\n\nQual é o CEP do imóvel onde será instalado o sistema solar?", () => {
+    addBotMessage("Perfeito! 📱\n\nQual é o seu número de WhatsApp?", () => {
+      setState((prev) => ({ ...prev, step: "whatsapp" }));
+      setInputType("phone");
+    });
+  }, [addUserMessage, addBotMessage, setInputType]);
+
+  const handleWhatsapp = useCallback((whatsapp: string) => {
+    addUserMessage(whatsapp);
+    setState((prev) => ({ ...prev, leadData: { ...prev.leadData, whatsapp } }));
+    
+    addBotMessage("Ótimo! 📍\n\nQual é o CEP do imóvel onde será instalado o sistema solar?", () => {
       setState((prev) => ({ ...prev, step: "cep" }));
       setInputType("cep");
     });
@@ -140,7 +154,37 @@ export const useChatFlow = () => {
       ? "Excelente! Você está na região de Campinas, onde atendemos! 🎯"
       : "Notamos que você está fora da RMC, mas vamos continuar sua simulação! 📊";
 
-    addBotMessage(`${cepMessage}\n\nQual é a média do seu consumo mensal de energia?`, () => {
+    addBotMessage(`${cepMessage}\n\nAgora me diga o nome da rua/avenida:`, () => {
+      setState((prev) => ({ ...prev, step: "endereco" }));
+      setInputType("text");
+    });
+  }, [addUserMessage, addBotMessage, setInputType]);
+
+  const handleEndereco = useCallback((endereco: string) => {
+    addUserMessage(endereco);
+    setState((prev) => ({ ...prev, leadData: { ...prev.leadData, endereco } }));
+    
+    addBotMessage("Qual é o número do imóvel? 🏠", () => {
+      setState((prev) => ({ ...prev, step: "numero" }));
+      setInputType("text");
+    });
+  }, [addUserMessage, addBotMessage, setInputType]);
+
+  const handleNumero = useCallback((numero: string) => {
+    addUserMessage(numero);
+    setState((prev) => ({ ...prev, leadData: { ...prev.leadData, numero } }));
+    
+    addBotMessage("E qual é o bairro? 📍", () => {
+      setState((prev) => ({ ...prev, step: "bairro" }));
+      setInputType("text");
+    });
+  }, [addUserMessage, addBotMessage, setInputType]);
+
+  const handleBairro = useCallback((bairro: string) => {
+    addUserMessage(bairro);
+    setState((prev) => ({ ...prev, leadData: { ...prev.leadData, bairro } }));
+    
+    addBotMessage("Perfeito! 📊\n\nQual é a média do seu consumo mensal de energia?", () => {
       setState((prev) => ({ ...prev, step: "consumo" }));
       setInputType("buttons", consumoOptions.map((opt) => ({
         label: opt.label,
@@ -216,7 +260,11 @@ export const useChatFlow = () => {
           id: Date.now().toString(),
           nome: prev.leadData.nome || "",
           cpf: prev.leadData.cpf || "",
+          whatsapp: prev.leadData.whatsapp || "",
           cep: prev.leadData.cep || "",
+          endereco: prev.leadData.endereco || "",
+          numero: prev.leadData.numero || "",
+          bairro: prev.leadData.bairro || "",
           consumo: prev.leadData.consumo || 0,
           tipoImovel: prev.leadData.tipoImovel || "residencial",
           kwp: (prev.leadData as any).kwp || 0,
@@ -255,7 +303,11 @@ export const useChatFlow = () => {
         id: Date.now().toString(),
         nome: prev.leadData.nome || "",
         cpf: prev.leadData.cpf || "",
+        whatsapp: prev.leadData.whatsapp || "",
         cep: prev.leadData.cep || "",
+        endereco: prev.leadData.endereco || "",
+        numero: prev.leadData.numero || "",
+        bairro: prev.leadData.bairro || "",
         consumo: prev.leadData.consumo || 0,
         tipoImovel: prev.leadData.tipoImovel || "residencial",
         kwp: (prev.leadData as any).kwp || 0,
@@ -308,11 +360,23 @@ export const useChatFlow = () => {
       case "cpf":
         handleCpf(text);
         break;
+      case "whatsapp":
+        handleWhatsapp(text);
+        break;
       case "cep":
         handleCep(text);
         break;
+      case "endereco":
+        handleEndereco(text);
+        break;
+      case "numero":
+        handleNumero(text);
+        break;
+      case "bairro":
+        handleBairro(text);
+        break;
     }
-  }, [state.step, handleNome, handleCpf, handleCep]);
+  }, [state.step, handleNome, handleCpf, handleWhatsapp, handleCep, handleEndereco, handleNumero, handleBairro]);
 
   useEffect(() => {
     return () => {

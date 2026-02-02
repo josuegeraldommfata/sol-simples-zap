@@ -59,15 +59,25 @@ export const ChatContainer = () => {
         )}
       </ScrollArea>
 
-      {(inputType === "text" || inputType === "cpf" || inputType === "cep") && !isTyping && (
+      {(inputType === "text" || inputType === "cpf" || inputType === "cep" || inputType === "phone") && !isTyping && (
         <ChatInput
           onSend={handleTextInput}
-          mask={inputType === "cpf" ? "cpf" : inputType === "cep" ? "cep" : "none"}
+          mask={
+            inputType === "cpf" 
+              ? "cpf" 
+              : inputType === "cep" 
+              ? "cep" 
+              : inputType === "phone"
+              ? "phone"
+              : "none"
+          }
           placeholder={
             inputType === "cpf"
               ? "Digite seu CPF..."
               : inputType === "cep"
               ? "Digite o CEP..."
+              : inputType === "phone"
+              ? "Digite seu WhatsApp..."
               : "Digite sua mensagem..."
           }
         />
