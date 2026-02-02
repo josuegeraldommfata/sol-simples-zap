@@ -44,11 +44,15 @@ export const LeadsDashboard = () => {
   }, [leads]);
 
   const exportCSV = () => {
-    const headers = ["Nome", "CPF", "CEP", "Consumo", "kWp", "Kit", "Valor", "Status", "Horário"];
+    const headers = ["Nome", "CPF", "WhatsApp", "CEP", "Endereço", "Número", "Bairro", "Consumo", "kWp", "Kit", "Valor", "Status", "Horário"];
     const rows = leads.map((lead) => [
       lead.nome,
       lead.cpf,
+      lead.whatsapp,
       lead.cep,
+      lead.endereco,
+      lead.numero,
+      lead.bairro,
       lead.consumo.toString(),
       lead.kwp.toString(),
       lead.kitNome,
@@ -174,9 +178,11 @@ export const LeadsDashboard = () => {
             <TableHeader>
               <TableRow>
                 <TableHead>Nome</TableHead>
-                <TableHead>CEP</TableHead>
+                <TableHead>CPF</TableHead>
+                <TableHead>WhatsApp</TableHead>
+                <TableHead>Endereço</TableHead>
                 <TableHead>Consumo</TableHead>
-                <TableHead>Kit Recomendado</TableHead>
+                <TableHead>Kit</TableHead>
                 <TableHead>Valor</TableHead>
                 <TableHead>Status</TableHead>
                 <TableHead>Agendamento</TableHead>
@@ -185,7 +191,7 @@ export const LeadsDashboard = () => {
             <TableBody>
               {filteredLeads.length === 0 ? (
                 <TableRow>
-                  <TableCell colSpan={7} className="text-center py-8 text-muted-foreground">
+                  <TableCell colSpan={9} className="text-center py-8 text-muted-foreground">
                     Nenhum lead encontrado
                   </TableCell>
                 </TableRow>
@@ -193,9 +199,15 @@ export const LeadsDashboard = () => {
                 filteredLeads.map((lead) => (
                   <TableRow key={lead.id}>
                     <TableCell className="font-medium">{lead.nome}</TableCell>
-                    <TableCell>{lead.cep}</TableCell>
+                    <TableCell className="text-xs">{lead.cpf}</TableCell>
+                    <TableCell className="text-xs">{lead.whatsapp}</TableCell>
+                    <TableCell className="text-xs max-w-[200px]">
+                      <div className="truncate" title={`${lead.endereco}, ${lead.numero} - ${lead.bairro} - ${lead.cep}`}>
+                        {lead.endereco}, {lead.numero} - {lead.bairro}
+                      </div>
+                    </TableCell>
                     <TableCell>{lead.consumo} kWh</TableCell>
-                    <TableCell>{lead.kitNome}</TableCell>
+                    <TableCell className="text-xs">{lead.kitNome}</TableCell>
                     <TableCell>{formatCurrency(lead.kitValor)}</TableCell>
                     <TableCell>
                       {lead.status === "quente" ? (

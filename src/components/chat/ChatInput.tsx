@@ -7,10 +7,10 @@ interface ChatInputProps {
   onSend: (message: string) => void;
   placeholder?: string;
   disabled?: boolean;
-  mask?: "cpf" | "cep" | "none";
+  mask?: "cpf" | "cep" | "phone" | "none";
 }
 
-const applyMask = (value: string, mask: "cpf" | "cep" | "none"): string => {
+const applyMask = (value: string, mask: "cpf" | "cep" | "phone" | "none"): string => {
   const numbers = value.replace(/\D/g, "");
   
   if (mask === "cpf") {
@@ -24,6 +24,13 @@ const applyMask = (value: string, mask: "cpf" | "cep" | "none"): string => {
   if (mask === "cep") {
     return numbers
       .slice(0, 8)
+      .replace(/(\d{5})(\d)/, "$1-$2");
+  }
+
+  if (mask === "phone") {
+    return numbers
+      .slice(0, 11)
+      .replace(/(\d{2})(\d)/, "($1) $2")
       .replace(/(\d{5})(\d)/, "$1-$2");
   }
   

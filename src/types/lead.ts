@@ -2,7 +2,11 @@ export interface Lead {
   id: string;
   nome: string;
   cpf: string;
+  whatsapp: string;
   cep: string;
+  endereco: string;
+  numero: string;
+  bairro: string;
   consumo: number;
   tipoImovel: "residencial" | "comercial";
   kwp: number;
@@ -25,7 +29,11 @@ export type ChatStep =
   | "lgpd"
   | "nome"
   | "cpf"
+  | "whatsapp"
   | "cep"
+  | "endereco"
+  | "numero"
+  | "bairro"
   | "consumo"
   | "tipo_imovel"
   | "resultado"
