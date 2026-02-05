@@ -19,7 +19,7 @@ export const HeroSection = ({ onOpenChat }: HeroSectionProps) => {
         <div className="max-w-4xl mx-auto text-center text-primary-foreground">
           {/* Logo centered on landing */}
           <div className="mb-6">
-            <img src="/zapsolar.png" alt="Zap Solar" className="mx-auto w-28 h-auto object-contain" />
+            <img src="/public/zapsolar.png" alt="Zap Solar" className="mx-auto w-28 h-auto object-contain" />
           </div>
           {/* Badge */}
           <div className="inline-flex items-center gap-2 bg-white/10 backdrop-blur-sm rounded-full px-4 py-2 mb-6 border border-white/20">
@@ -35,7 +35,7 @@ export const HeroSection = ({ onOpenChat }: HeroSectionProps) => {
 
           {/* Subheadline */}
           <p className="text-xl md:text-2xl mb-8 opacity-90 max-w-2xl mx-auto">
-            Reduza até <strong className="text-yellow-400">95%</strong> da sua conta de energia 
+            Reduza até <strong className="text-yellow-400">95%</strong> da sua conta de energia
             com painéis solares. Investimento que se paga em{" "}
             <strong className="text-yellow-400">menos de 4 anos</strong>.
           </p>
@@ -62,16 +62,16 @@ export const HeroSection = ({ onOpenChat }: HeroSectionProps) => {
 
           {/* CTA Buttons */}
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <Button 
-              size="lg" 
+            <Button
+              size="lg"
               onClick={onOpenChat}
               className="bg-yellow-400 hover:bg-yellow-500 text-gray-900 font-bold text-lg px-8 py-6 rounded-full shadow-lg shadow-yellow-400/30 transition-all hover:scale-105"
             >
               <Zap className="w-5 h-5 mr-2" />
               Simular Minha Economia
             </Button>
-            <Button 
-              size="lg" 
+            <Button
+              size="lg"
               variant="outline"
               className="border-white/30 text-white hover:bg-white/10 font-semibold text-lg px-8 py-6 rounded-full"
             >
@@ -96,8 +96,8 @@ export const HeroSection = ({ onOpenChat }: HeroSectionProps) => {
       {/* Wave divider */}
       <div className="absolute bottom-0 left-0 right-0">
         <svg viewBox="0 0 1440 120" fill="none" xmlns="http://www.w3.org/2000/svg">
-          <path 
-            d="M0 120L60 110C120 100 240 80 360 70C480 60 600 60 720 65C840 70 960 80 1080 85C1200 90 1320 90 1380 90L1440 90V120H1380C1320 120 1200 120 1080 120C960 120 840 120 720 120C600 120 480 120 360 120C240 120 120 120 60 120H0Z" 
+          <path
+            d="M0 120L60 110C120 100 240 80 360 70C480 60 600 60 720 65C840 70 960 80 1080 85C1200 90 1320 90 1380 90L1440 90V120H1380C1320 120 1200 120 1080 120C960 120 840 120 720 120C600 120 480 120 360 120C240 120 120 120 60 120H0Z"
             className="fill-background"
           />
         </svg>

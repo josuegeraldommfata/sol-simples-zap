@@ -9,12 +9,12 @@ export const Footer = () => {
           <div className="md:col-span-2">
             <div className="flex items-center gap-3 mb-4">
               <div className="w-10 h-10 rounded-full overflow-hidden flex items-center justify-center bg-white/5">
-                <img src="/zapsolar.png" alt="Zap Solar" className="w-10 h-10 object-cover" />
+                <img src="/public/zapsolar.png" alt="Zap Solar" className="w-10 h-10 object-cover" />
               </div>
               <span className="text-xl font-bold text-card-foreground">Zap Solar</span>
             </div>
             <p className="text-muted-foreground mb-4 max-w-md">
-              Transformando o sol em economia para mais de 500 famílias na região de Campinas. 
+              Transformando o sol em economia para mais de 500 famílias na região de Campinas.
               Energia limpa, sustentável e que cabe no seu bolso.
             </p>
             <div className="flex gap-3">
