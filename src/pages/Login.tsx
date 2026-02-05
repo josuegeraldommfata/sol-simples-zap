@@ -51,8 +51,8 @@ const Login = () => {
       <div className="w-full max-w-md space-y-6">
         {/* Logo */}
         <div className="text-center space-y-2">
-          <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-gradient-to-br from-whatsapp-green to-primary shadow-lg">
-            <Sun className="w-8 h-8 text-white" />
+          <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-gradient-to-br from-whatsapp-green to-primary shadow-lg overflow-hidden">
+            <img src="/zapsolar.png" alt="Zap Solar" className="w-12 h-12 object-contain" />
           </div>
           <h1 className="text-3xl font-bold bg-gradient-to-r from-whatsapp-green to-primary bg-clip-text text-transparent">
             Zap Solar

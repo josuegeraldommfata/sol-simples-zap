@@ -7,11 +7,11 @@ export const Footer = () => {
         <div className="grid md:grid-cols-4 gap-8 mb-8">
           {/* Brand */}
           <div className="md:col-span-2">
-            <div className="flex items-center gap-2 mb-4">
-              <div className="w-10 h-10 rounded-full bg-primary flex items-center justify-center">
-                <Sun className="w-6 h-6 text-primary-foreground" />
+            <div className="flex items-center gap-3 mb-4">
+              <div className="w-10 h-10 rounded-full overflow-hidden flex items-center justify-center bg-white/5">
+                <img src="/zapsolar.png" alt="Zap Solar" className="w-10 h-10 object-cover" />
               </div>
-              <span className="text-xl font-bold text-card-foreground">Zap Solar ☀️</span>
+              <span className="text-xl font-bold text-card-foreground">Zap Solar</span>
             </div>
             <p className="text-muted-foreground mb-4 max-w-md">
               Transformando o sol em economia para mais de 500 famílias na região de Campinas. 

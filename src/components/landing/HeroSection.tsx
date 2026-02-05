@@ -17,6 +17,10 @@ export const HeroSection = ({ onOpenChat }: HeroSectionProps) => {
 
       <div className="container mx-auto px-4 py-16 relative z-10">
         <div className="max-w-4xl mx-auto text-center text-primary-foreground">
+          {/* Logo centered on landing */}
+          <div className="mb-6">
+            <img src="/zapsolar.png" alt="Zap Solar" className="mx-auto w-28 h-auto object-contain" />
+          </div>
           {/* Badge */}
           <div className="inline-flex items-center gap-2 bg-white/10 backdrop-blur-sm rounded-full px-4 py-2 mb-6 border border-white/20">
             <Sun className="w-4 h-4 text-yellow-400" />
