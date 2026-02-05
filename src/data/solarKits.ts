@@ -43,3 +43,17 @@ export const formatCurrency = (value: number): string => {
     minimumFractionDigits: 0,
   }).format(value);
 };
+
+/**
+ * Estima economia mensal e anual a partir do consumo médio (kWh) e percentual de offset.
+ * Observação: usa uma tarifa média estimada (R$ 0.85 / kWh). Pode ser ajustada conforme necessário.
+ */
+export const estimateSavings = (
+  consumoMedioKwh: number,
+  percentualEconomia = 0.9,
+  tarifaKwh = 0.85
+) => {
+  const economiaMensal = consumoMedioKwh * tarifaKwh * percentualEconomia;
+  const economiaAnual = economiaMensal * 12;
+  return { economiaMensal, economiaAnual };
+};

@@ -12,6 +12,11 @@ export interface Lead {
   kwp: number;
   kitNome: string;
   kitValor: number;
+  fase?: "monofasico" | "bifasico" | "trifasico";
+  tensao?: "110v" | "220v" | "380v";
+  tipoTelhado?: "ceramica" | "concreto" | "fibrocimento" | "metalica";
+  estruturaTelhado?: "metal" | "madeira" | "concreto";
+  consumoMedioKwh?: number;
   status: "quente" | "frio";
   horarioAgendamento?: "manha" | "tarde";
   createdAt: Date;
@@ -36,6 +41,11 @@ export type ChatStep =
   | "bairro"
   | "consumo"
   | "tipo_imovel"
+  | "fase"
+  | "tensao"
+  | "tipo_telhado"
+  | "estrutura_telhado"
+  | "consumo_medio"
   | "resultado"
   | "agendamento"
   | "horario"

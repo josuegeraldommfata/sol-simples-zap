@@ -1,6 +1,6 @@
 import { useState, useCallback, useRef, useEffect } from "react";
 import { ChatMessage, ChatStep, Lead } from "@/types/lead";
-import { calculateKwp, findKitByKwp, formatCurrency, consumoOptions } from "@/data/solarKits";
+import { calculateKwp, findKitByKwp, formatCurrency, consumoOptions, estimateSavings } from "@/data/solarKits";
 import { saveLead } from "@/data/mockLeads";
 
 interface LeadData {
@@ -13,6 +13,11 @@ interface LeadData {
   bairro: string;
   consumo: number;
   tipoImovel: "residencial" | "comercial";
+  fase?: "monofasico" | "bifasico" | "trifasico";
+  tensao?: "110v" | "220v" | "380v";
+  tipoTelhado?: "ceramica" | "concreto" | "fibrocimento" | "metalica";
+  estruturaTelhado?: "metal" | "madeira" | "concreto";
+  consumoMedioKwh?: number; // média mensal em kWh (soma 12 meses / 12)
 }
 
 interface ChatFlowState {
@@ -209,35 +214,82 @@ export const useChatFlow = () => {
 
   const handleTipoImovel = useCallback((tipo: "residencial" | "comercial", label: string) => {
     addUserMessage(label);
-    
-    setState((prev) => {
-      const leadData = { ...prev.leadData, tipoImovel: tipo };
-      const consumo = leadData.consumo || 300;
-      const isComercial = tipo === "comercial";
-      const kwp = calculateKwp(consumo, isComercial);
-      const kit = findKitByKwp(kwp);
+    // After choosing property type, collect electrical and roof details before calculating kit
+    setState((prev) => ({ ...prev, leadData: { ...prev.leadData, tipoImovel: tipo }, step: "fase" }));
+    setInputType("buttons", [
+      { label: "⚡ Monofásico", value: "monofasico" },
+      { label: "⚡⚡ Bifásico", value: "bifasico" },
+      { label: "⚡⚡⚡ Trifásico", value: "trifasico" },
+    ]);
+  }, [addBotMessage, setInputType]);
 
+  const handleFase = useCallback((fase: string, label: string) => {
+    addUserMessage(label);
+    setState((prev) => ({ ...prev, leadData: { ...prev.leadData, fase: fase as any }, step: "tensao" }));
+    setInputType("buttons", [
+      { label: "110v", value: "110v" },
+      { label: "220v", value: "220v" },
+      { label: "380v", value: "380v" },
+    ]);
+  }, [addUserMessage, setInputType]);
+
+  const handleTensao = useCallback((tensao: string, label: string) => {
+    addUserMessage(label);
+    setState((prev) => ({ ...prev, leadData: { ...prev.leadData, tensao: tensao as any }, step: "tipo_telhado" }));
+    setInputType("buttons", [
+      { label: "Cerâmica", value: "ceramica" },
+      { label: "Concreto", value: "concreto" },
+      { label: "Fibrocimento", value: "fibrocimento" },
+      { label: "Metálica", value: "metalica" },
+    ]);
+  }, [addUserMessage, setInputType]);
+
+  const handleTipoTelhado = useCallback((tipo: string, label: string) => {
+    addUserMessage(label);
+    setState((prev) => ({ ...prev, leadData: { ...prev.leadData, tipoTelhado: tipo as any }, step: "estrutura_telhado" }));
+    setInputType("buttons", [
+      { label: "Metal", value: "metal" },
+      { label: "Madeira", value: "madeira" },
+      { label: "Concreto", value: "concreto" },
+    ]);
+  }, [addUserMessage, setInputType]);
+
+  const handleEstruturaTelhado = useCallback((estrutura: string, label: string) => {
+    addUserMessage(label);
+    // Ask for the average monthly consumption in kWh (soma 12 meses / 12)
+    addBotMessage("Agora informe a média do seu consumo mensal em kWh (soma dos últimos 12 meses / 12). Ex: 450", () => {
+      setState((prev) => ({ ...prev, step: "consumo_medio" }));
+      setInputType("text");
+    });
+    setState((prev) => ({ ...prev, leadData: { ...prev.leadData, estruturaTelhado: estrutura as any } }));
+  }, [addUserMessage, addBotMessage, setInputType]);
+
+  const handleConsumoMedio = useCallback((text: string) => {
+    // numeric value expected
+    const consumoMedioKwh = parseFloat(text.replace(/[^0-9\.]/g, "")) || 0;
+    addUserMessage(text);
+
+    setState((prev) => {
+      const leadData = { ...prev.leadData, consumoMedioKwh } as any;
+      const isComercial = leadData.tipoImovel === "comercial";
+      // calculate recommended kWp based on provided average consumption
+      const kwp = calculateKwp(consumoMedioKwh, isComercial);
+      const kit = findKitByKwp(kwp);
+      const savings = estimateSavings(consumoMedioKwh, 0.9, 0.85); // 90% offset, R$0.85/kWh default
+
+      // save lead and show pre-orçamento
       setTimeout(() => {
         addBotMessage(
-          `Perfeito, ${leadData.nome}! 😄\n\n📊 Com base no seu consumo, o sistema ideal é de ${kwp} kWp.\n\n👉 Recomendamos o ${kit.nome}, com investimento estimado de ${formatCurrency(kit.valor)}.`,
+          `Perfeito! ✅\n\nCom média de consumo de ${consumoMedioKwh} kWh/mês, estimamos um sistema de ~${kwp} kWp.\n\n👉 Recomendamos o *${kit.nome}* com investimento estimado de ${formatCurrency(kit.valor)}.\n\nEconomia estimada: ${formatCurrency(savings.economiaMensal)} / mês • ${formatCurrency(savings.economiaAnual)} / 12 meses.\n\nPodendo financiar em até 24 meses (mediante análise de crédito).`,
           () => {
             setState((prev) => ({ ...prev, step: "agendamento" }));
             setInputType("buttons", [
               { label: "📅 Sim, quero agendar!", value: "agendar" },
               { label: "❌ Não, obrigado", value: "nao" },
             ]);
-            setTimeout(() => {
-              setState((prev) => ({
-                ...prev,
-                messages: [
-                  ...prev.messages,
-                  createMessage("bot", "Deseja agendar uma visita técnica gratuita?"),
-                ],
-              }));
-            }, TYPING_DELAY);
           }
         );
-      }, 100);
+      }, 200);
 
       return {
         ...prev,
@@ -249,7 +301,7 @@ export const useChatFlow = () => {
         } as any,
       };
     });
-  }, [addBotMessage, setInputType]);
+  }, [addUserMessage, addBotMessage]);
 
   const handleAgendamento = useCallback((quer: boolean) => {
     addUserMessage(quer ? "📅 Sim, quero agendar!" : "❌ Não, obrigado");
@@ -270,6 +322,11 @@ export const useChatFlow = () => {
           kwp: (prev.leadData as any).kwp || 0,
           kitNome: (prev.leadData as any).kitNome || "",
           kitValor: (prev.leadData as any).kitValor || 0,
+          fase: (prev.leadData as any).fase,
+          tensao: (prev.leadData as any).tensao,
+          tipoTelhado: (prev.leadData as any).tipoTelhado,
+          estruturaTelhado: (prev.leadData as any).estruturaTelhado,
+          consumoMedioKwh: (prev.leadData as any).consumoMedioKwh,
           status: "frio",
           createdAt: new Date(),
         };
@@ -313,6 +370,11 @@ export const useChatFlow = () => {
         kwp: (prev.leadData as any).kwp || 0,
         kitNome: (prev.leadData as any).kitNome || "",
         kitValor: (prev.leadData as any).kitValor || 0,
+        fase: (prev.leadData as any).fase,
+        tensao: (prev.leadData as any).tensao,
+        tipoTelhado: (prev.leadData as any).tipoTelhado,
+        estruturaTelhado: (prev.leadData as any).estruturaTelhado,
+        consumoMedioKwh: (prev.leadData as any).consumoMedioKwh,
         status: "quente",
         horarioAgendamento: horario,
         createdAt: new Date(),
@@ -339,6 +401,18 @@ export const useChatFlow = () => {
         break;
       case "consumo":
         handleConsumo(value, label);
+        break;
+      case "fase":
+        handleFase(value, label);
+        break;
+      case "tensao":
+        handleTensao(value, label);
+        break;
+      case "tipo_telhado":
+        handleTipoTelhado(value, label);
+        break;
+      case "estrutura_telhado":
+        handleEstruturaTelhado(value, label);
         break;
       case "tipo_imovel":
         handleTipoImovel(value as "residencial" | "comercial", label);
@@ -374,6 +448,9 @@ export const useChatFlow = () => {
         break;
       case "bairro":
         handleBairro(text);
+        break;
+      case "consumo_medio":
+        handleConsumoMedio(text);
         break;
     }
   }, [state.step, handleNome, handleCpf, handleWhatsapp, handleCep, handleEndereco, handleNumero, handleBairro]);
