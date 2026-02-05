@@ -1,6 +1,6 @@
 import { useState, useMemo } from "react";
 import { getStoredLeads, clearLeads } from "@/data/mockLeads";
-import { formatCurrency } from "@/data/solarKits";
+import { formatCurrency, estimateSavings } from "@/data/solarKits";
 import { Lead } from "@/types/lead";
 import {
   Table,
@@ -44,22 +44,52 @@ export const LeadsDashboard = () => {
   }, [leads]);
 
   const exportCSV = () => {
-    const headers = ["Nome", "CPF", "WhatsApp", "CEP", "Endereço", "Número", "Bairro", "Consumo", "kWp", "Kit", "Valor", "Status", "Horário"];
-    const rows = leads.map((lead) => [
-      lead.nome,
-      lead.cpf,
-      lead.whatsapp,
-      lead.cep,
-      lead.endereco,
-      lead.numero,
-      lead.bairro,
-      lead.consumo.toString(),
-      lead.kwp.toString(),
-      lead.kitNome,
-      lead.kitValor.toString(),
-      lead.status,
-      lead.horarioAgendamento || "-",
-    ]);
+    const headers = [
+      "Nome",
+      "CPF",
+      "WhatsApp",
+      "CEP",
+      "Endereço",
+      "Número",
+      "Bairro",
+      "Consumo",
+      "Consumo Médio (kWh)",
+      "kWp",
+      "Kit",
+      "Valor",
+      "Fase",
+      "Tensão",
+      "Tipo Telhado",
+      "Estrutura Telhado",
+      "Economia Anual (R$)",
+      "Status",
+      "Horário",
+    ];
+
+    const rows = leads.map((lead) => {
+      const economia = lead.consumoMedioKwh ? estimateSavings(lead.consumoMedioKwh, 0.9, 0.85) : null;
+      return [
+        lead.nome,
+        lead.cpf,
+        lead.whatsapp,
+        lead.cep,
+        lead.endereco,
+        lead.numero,
+        lead.bairro,
+        lead.consumo.toString(),
+        (lead.consumoMedioKwh || "-").toString(),
+        (lead.kwp || 0).toString(),
+        lead.kitNome,
+        lead.kitValor.toString(),
+        (lead as any).fase || "-",
+        (lead as any).tensao || "-",
+        (lead as any).tipoTelhado || "-",
+        (lead as any).estruturaTelhado || "-",
+        economia ? economia.economiaAnual.toFixed(2) : "-",
+        lead.status,
+        lead.horarioAgendamento || "-",
+      ];
+    });
 
     const csvContent = [headers, ...rows].map((row) => row.join(",")).join("\n");
     const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
@@ -182,8 +212,13 @@ export const LeadsDashboard = () => {
                 <TableHead>WhatsApp</TableHead>
                 <TableHead>Endereço</TableHead>
                 <TableHead>Consumo</TableHead>
+                <TableHead>Consumo Médio (kWh)</TableHead>
                 <TableHead>Kit</TableHead>
                 <TableHead>Valor</TableHead>
+                <TableHead>Fase</TableHead>
+                <TableHead>Tensão</TableHead>
+                <TableHead>Tipo Telhado</TableHead>
+                <TableHead>Estrutura</TableHead>
                 <TableHead>Status</TableHead>
                 <TableHead>Agendamento</TableHead>
               </TableRow>
@@ -207,8 +242,13 @@ export const LeadsDashboard = () => {
                       </div>
                     </TableCell>
                     <TableCell>{lead.consumo} kWh</TableCell>
+                    <TableCell>{(lead as any).consumoMedioKwh ? `${(lead as any).consumoMedioKwh} kWh` : "-"}</TableCell>
                     <TableCell className="text-xs">{lead.kitNome}</TableCell>
                     <TableCell>{formatCurrency(lead.kitValor)}</TableCell>
+                    <TableCell className="text-xs">{(lead as any).fase || "-"}</TableCell>
+                    <TableCell className="text-xs">{(lead as any).tensao || "-"}</TableCell>
+                    <TableCell className="text-xs">{(lead as any).tipoTelhado || "-"}</TableCell>
+                    <TableCell className="text-xs">{(lead as any).estruturaTelhado || "-"}</TableCell>
                     <TableCell>
                       {lead.status === "quente" ? (
                         <Badge className="bg-status-hot hover:bg-status-hot/90 text-status-hot-foreground">
